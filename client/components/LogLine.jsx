@@ -51,7 +51,7 @@ export default class LogLine extends Component {
         return (
           <span>
             <span style={{color: COLORS.channel, marginRight: 4}}>[{message.channel}]</span>
-            <span style={{color: COLORS.player, marginRight: 4}}>{message.player.name}:</span>
+            <span style={{color: COLORS.player, marginRight: 4}}>{message.player}:</span>
             <span style={{color: COLORS.chat}}>{message.text}</span>
           </span>
         )

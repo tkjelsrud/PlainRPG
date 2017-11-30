@@ -38,6 +38,11 @@ export default class Population {
       console.log(player.name, 'disconnected')
       this.disconnectPlayer(player)
     })
+
+    connection.on('error', e => {
+	    console.log('socket error', e)
+      this.disconnectPlayer(player)
+    })
   }
 
   disconnectPlayer(player) {
