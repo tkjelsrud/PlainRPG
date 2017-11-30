@@ -5,11 +5,15 @@ import {
 
 const COLORS = {
   info: '#b1b1b1',
-  login: '#92aff5',
-  logout: '#92aff5',
+  login: '#b6c9f9',
+  logout: '#b6c9f9',
+  roomInfo: '#92aff5',
   channel: '#50bd50',
   player: '#50bd50',
-  chat: '#50bd50',
+  chat: '#99e099',
+  move: '#426ae6',
+  joinParty: '#78e267',
+  unknown: '#787b1b',
 }
 
 export default class LogLine extends Component {
@@ -30,8 +34,16 @@ export default class LogLine extends Component {
       case 'logout':
         text = `${message.player} logged out`
         break
+      case 'roomInfo':
+        text = `You entered ${message.room}`
+        break
+      case 'move':
+        text = `${message.player} ${message.entered ? 'entered' : 'left'} the room`
+        break
+      case 'joinParty':
+        text = 'You have joined a party'
+        break
       case 'chat':
-      console.log(message)
         return (
           <span>
             <span style={{color: COLORS.channel, marginRight: 4}}>[{message.channel}]</span>
@@ -51,7 +63,9 @@ export default class LogLine extends Component {
       )
     }
 
-    return null
+    return (
+      <span style={{color: COLORS.unknown}}>{JSON.stringify(message)}</span>
+    )
   }
 
   render() {

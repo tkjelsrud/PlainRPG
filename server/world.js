@@ -1,94 +1,84 @@
+import Population from './Population'
 import {staticRoomData} from './rooms'
 
 export default class World {
   constructor(name, connection) {
-    this.players = []
-
-    this.pingInterval = setInterval(() => {
-      this.players.forEach(player => {
-        const connection = player.connection
-        if (!connection.isConnected) {
-          player.connected = false
-          this.broadcastDisconnect(player)
-          return connection.terminate()
-        }
-
-        connection.isConnected = false
-        connection.ping('', false, true)
-      })
-      this.players = this.players.filter(p => p.connected)
-    }, 5000)
-  }
-
-  playersInRoom(room) {
-    return this.players.filter(p => p.room === room).map(p => p.name)
+    this.population = new Population
   }
 
   roomInfo(room) {
     return {
       type: 'roomInfo',
       ...staticRoomData(room),
-      players: this.playersInRoom(room),
+      players: this.population.playersInRoom(room),
     }
   }
 
-  broadcastLogin(player) {
-    this.players.forEach(recipient => {
-      if (recipient !== player) {
-        recipient.send({type: 'playerLoggedIn', player: player.name, room: player.room})
-      }
-    })
+  findConnectedRoom(room, dir) {
+    const roomInfo = this.roomInfo(room)
+    const exit = roomInfo.exits.find(e => e.dir === dir)
+    if (exit) {
+      return this.roomInfo(exit.room)
+    }
+    else {
+      // TODO
+      console.warn('invalid move from', room, '->', dir)
+    }
   }
 
-  broadcastDisconnect(player) {
-    this.players.forEach(recipient => {
-      recipient.send({type: 'playerLoggedOut', player: player.name, room: player.room})
-    })
-  }
-
-  findPlayer(connection) {
-    return this.players.find(p => p.connection === connection)
-  }
-
-  addPlayer(player) {
-    this.players.push(player)
-
-    const connection = player.connection
-
-    connection.isConnected = true
-    connection.on('pong', () => connection.isConnected = true)
-
-    connection.on('close', () => {
-      player.disconnect()
-      console.log(player.name, 'disconnected')
-      this.players = this.players.filter(p => p !== player)
-      this.broadcastDisconnect(player)
-    })
+  sendRoomInfo(room) {
+    const roomInfo = this.roomInfo(room)
+    return {
+      ...roomInfo,
+      players: roomInfo.players.map(p => p.name)
+    }
   }
 
   playerLogin(player) {
-    this.addPlayer(player)
+    this.population.addPlayer(player)
 
     player.room = 0 // TODO: persist and retrieve
 
-    this.broadcastLogin(player)
+    this.population.broadcastLogin(player)
 
-    player.send(this.roomInfo(player.room))
-
-    // setTimeout(() => player.send({type: 'text', text: 'Enjoying yourself here?'}), 2000)
+    player.send(this.sendRoomInfo(player.room))
   }
 
   chat(sender, channel, text) {
-    this.players.forEach(recipient => {
-      if (channel === 'global' || recipient.room === sender.room) {
-        recipient.send({
-          type: 'chat',
-          channel,
-          player: sender.name,
-          // room: sender.room,
-          text
-        })
+    let recipients = []
+    if (channel === 'global') {
+      recipients = this.population.players
+    }
+    if (channel === 'room') {
+      recipients = this.population.playersInRoom(sender.room)
+    }
+    if (channel === 'party') {
+      const party = this.population.findParty(sender)
+      if (party) {
+        recipients = party.players
       }
+    }
+
+    recipients.forEach(recipient => {
+      recipient.send({
+        type: 'chat',
+        channel,
+        player: sender.name,
+        // room: sender.room,
+        text
+      })
     })
+  }
+
+  move(player, dir) {
+    const roomInfo = this.findConnectedRoom(player.room, dir)
+    if (roomInfo) {
+      const newRoomId = roomInfo.id
+      this.population.broadcastMove(player, player.room, newRoomId)
+
+      player.room = newRoomId
+
+      player.send(this.sendRoomInfo(newRoomId))
+    }
   }
 }

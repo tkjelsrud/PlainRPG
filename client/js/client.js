@@ -40,6 +40,10 @@ export default class Client {
     })
   }
 
+  incoming(cb) {
+    this.appCallback = cb
+  }
+
   send(message) {
     this.debug('sending:', message)
     this.socket.send(JSON.stringify(message))
@@ -54,17 +58,31 @@ export default class Client {
     })
   }
 
-  userText(text, channel) {
-    this.debug('sending user text', text)
+  chat(text, channel) {
+    this.debug('sending chat', text)
 
     this.send({
-      type: 'userText',
+      type: 'chat',
       channel,
       text,
     })
   }
 
-  incoming(cb) {
-    this.appCallback = cb
+  move(dir) {
+    this.debug('moving', dir)
+
+    this.send({
+      type: 'move',
+      dir,
+    })
+  }
+
+  partyInvite(player) {
+    this.debug('inviting', player, 'to party')
+
+    this.send({
+      type: 'partyInvite',
+      player,
+    })
   }
 }

@@ -10,15 +10,39 @@ import {
   Room,
 } from '.'
 
+const MAX_LOG_ENTRIES = 100
+
 export default class App extends Component {
   state = {
     client: null,
     messageLog: [],
+    myPlayer: {
+      playerName: '',
+    },
+    party: {
+      leader: null,
+      players: [],
+    },
     roomInfo: {
       id: null,
       players: [],
       name: '',
     }
+  }
+
+  componentDidMount() {
+    const client = new Client
+    this.setState({client})
+
+    const playerName = `Player_${Math.floor(Math.random()*900 + 100)}`
+
+    client.connect()
+    .then(() => {
+      this.logMessage({type: 'info', text: 'Logging in...'})
+      client.login(playerName)
+    })
+
+    client.incoming(::this.handleMessage)
   }
 
   addToRoom(player) {
@@ -35,30 +59,36 @@ export default class App extends Component {
     }})
   }
 
-  componentDidMount() {
-    const client = new Client
-    this.setState({client})
+  playerMoved({player, from, to}) {
+    if (to === this.state.roomInfo.id) {
+      this.logMessage({type: 'move', player: player, entered: true})
+      this.addToRoom(player)
+    }
+    else if (from === this.state.roomInfo.id) {
+      this.logMessage({type: 'move', player: player, entered: false})
+      this.removeFromRoom(player)
+    }
+  }
 
-    const playerName = `Player_${Math.floor(Math.random()*900 + 100)}`
+  roomInfo({id, name, players, exits}) {
+    this.setState({roomInfo: {id, name, players, exits}})
+    this.logMessage({type: 'roomInfo', room: name})
+  }
 
-    client.connect()
-      .then(() => {
-        this.logMessage({type: 'info', text: 'Logging in...'})
-        client.login(playerName)
-      })
-
-    client.incoming(::this.handleMessage)
+  partyInfo({leader, players}) {
+    if (!this.state.party.players.length) this.logMessage({type: 'joinParty'})
+    this.setState({party: {leader, players}})
   }
 
   handleMessage(message) {
     switch (message.type) {
       case 'text':
-        console.log('!!!!!!!!!!!!!!!!!!recd type text', message)
         this.logMessage({type: 'info', text: message.text})
         break
       case 'login':
         if (message.success) {
           this.logMessage({type: 'info', text: message.text})
+          this.setState({myPlayer: {name: message.playerName}})
         }
         else {
           // TODO
@@ -76,9 +106,14 @@ export default class App extends Component {
           this.removeFromRoom(message.player)
         }
         break
+      case 'playerMoved':
+        this.playerMoved(message)
+        break
       case 'roomInfo':
-        const {id, name, players} = message
-        this.setState({roomInfo: {id, name, players}})
+        this.roomInfo(message)
+        break
+      case 'partyInfo':
+        this.partyInfo(message)
         break
       case 'chat':
         const {player, channel, text} = message
@@ -90,18 +125,25 @@ export default class App extends Component {
   }
 
   logMessage(message) {
-    this.setState({messageLog: [
-      ...this.state.messageLog,
-      {
-        ...message,
-        timestamp: moment(),
-      },
-    ]})
+    const entry = {
+      ...message,
+      timestamp: moment(),
+    }
+
+    const entries = [...this.state.messageLog, entry]
+    this.setState({messageLog: entries.slice(Math.max(entries.length - MAX_LOG_ENTRIES, 0), entries.length)})
   }
 
-  userText({text, channel}) {
-    // this.logMessage(`>> ${text}`)
-    this.state.client.userText(text, channel)
+  chat({text, channel}) {
+    this.state.client.chat(text, channel)
+  }
+
+  onMove(dir) {
+    this.state.client.move(dir)
+  }
+
+  onInvite(player) {
+    this.state.client.partyInvite(player)
   }
 
   render() {
@@ -111,11 +153,17 @@ export default class App extends Component {
           <h3>Lemuria Online</h3>
           <MessageLog messages={this.state.messageLog} />
           <div style={{marginTop: 6}}>
-            <GameInput onSubmit={::this.userText} />
+            <GameInput onSubmit={::this.chat} />
           </div>
         </div>
         <div style={{width: 200, marginLeft: 10}}>
-          <Room roomInfo={this.state.roomInfo} />
+          <Room
+            roomInfo={this.state.roomInfo}
+            onMove={::this.onMove}
+            party={this.state.party}
+            myPlayer={this.state.myPlayer}
+            onInvite={::this.onInvite}
+          />
         </div>
       </div>
     )

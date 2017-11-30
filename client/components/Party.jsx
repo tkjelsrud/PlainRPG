@@ -1,14 +1,13 @@
 import React, { Component } from 'react'
 
 import {
-  PlayerEntry,
+  PartyEntry,
 } from '.'
 
-export default class PlayerList extends Component {
+export default class Party extends Component {
   static propTypes = {
-    players: React.PropTypes.array,
+    party: React.PropTypes.object,
     myPlayer: React.PropTypes.object,
-    onInvite: React.PropTypes.func,
   }
 
   state = {
@@ -22,14 +21,14 @@ export default class PlayerList extends Component {
   render() {
     return (
       <div style={{}}>
-        <div style={{fontWeight: 'bold'}}>Players in room:</div>
-        {this.props.players.map((p, i) => <PlayerEntry
+        <div style={{fontWeight: 'bold'}}>Party:</div>
+        {this.props.party.players.map((p, i) => <PartyEntry
           key={i}
-          player={{name: p}}
+          player={p}
           isMe={p === this.props.myPlayer.name}
           isSelected={this.state.selected === p}
+          isLeader={this.props.party.leader === p.name}
           onClick={evt => this.select(p)}
-          onInvite={() => this.props.onInvite(p)}
         />)}
       </div>
     )

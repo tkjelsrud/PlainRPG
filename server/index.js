@@ -1,2 +1,3 @@
-export Player from './Player'
-export World from './World'
+export Player from './player'
+export Population from './population'
+export World from './world'
