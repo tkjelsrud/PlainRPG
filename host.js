@@ -1,7 +1,6 @@
 import WebSocket from 'ws'
 
 import {
-  Player,
   World,
 } from './server'
 
@@ -21,7 +20,18 @@ function handleMessage(message, connection) {
   switch (message.type) {
     case 'login': {
       // TODO: verify login
-      player = new Player(message.name, connection)
+      const loginName = message.name
+
+      player = world.population.findPlayerByName(loginName)
+      if (player) {
+        debug(`disconnecting reconnecting player ${loginName}`)
+        world.population.disconnectPlayer(player)
+      }
+
+      player = world.population.getPlayer(loginName)
+      player.connection = connection
+      player.connected = true
+
       player.send({type: 'login', success: true, text: `Welcome, ${player.name}!`, playerName: player.name})
       world.playerLogin(player)
       debug(`${player.name} logged in`)

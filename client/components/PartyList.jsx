@@ -4,7 +4,7 @@ import {
   PartyEntry,
 } from '.'
 
-export default class Party extends Component {
+export default class PartyList extends Component {
   static propTypes = {
     party: React.PropTypes.object,
     myPlayer: React.PropTypes.object,
@@ -19,10 +19,16 @@ export default class Party extends Component {
   }
 
   render() {
+    const me = this.props.myPlayer
+    const sorted = this.props.party.players
+      .filter(p => p.name !== me.name)
+      .sort((a, b) => a.name.localeCompare(b.name))
+
+    sorted.unshift(me)
+
     return (
       <div style={{}}>
-        <div style={{fontWeight: 'bold'}}>Party:</div>
-        {this.props.party.players.map((p, i) => <PartyEntry
+        {sorted.map((p, i) => <PartyEntry
           key={i}
           player={p}
           isMe={p === this.props.myPlayer.name}

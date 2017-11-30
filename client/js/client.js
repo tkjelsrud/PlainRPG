@@ -77,12 +77,12 @@ export default class Client {
     })
   }
 
-  partyInvite(player) {
-    this.debug('inviting', player, 'to party')
+  partyInvite({name}) {
+    this.debug('inviting', name, 'to party')
 
     this.send({
       type: 'partyInvite',
-      player,
+      player: name,
     })
   }
 }

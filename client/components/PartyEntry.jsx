@@ -6,26 +6,18 @@ import {
 export default class PartyEntry extends Component {
   static propTypes = {
     player: React.PropTypes.object,
-    onClick: React.PropTypes.func,
-    isSelected: React.PropTypes.bool,
     isMe: React.PropTypes.bool,
+    isSelected: React.PropTypes.bool,
     isLeader: React.PropTypes.bool,
+    onClick: React.PropTypes.func,
   }
 
-  buttons() {
-    // if (this.props.isSelected && !this.props.isMe) {
-    //   return (
-    //     <div>
-    //       <button type="button" style={{cursor: 'pointer'}}>I</button>
-    //     </div>
-    //   )
-    // }
-  }
-
-  leaderIcon() {
-    return (
-      <span style={{fontSize: '11px'}}>👑</span>
-    )
+  playerIcon() {
+    if (this.props.isLeader) {
+      return (
+        <span style={{fontSize: '11px'}}>👑</span>
+      )
+    }
   }
 
   render() {
@@ -33,8 +25,8 @@ export default class PartyEntry extends Component {
     return (
       <div style={{display: 'flex', cursor: 'pointer', backgroundColor}} onClick={::this.props.onClick}>
         <div style={{padding: '2px 0', display: 'flex', width: '100%'}}>
-          <div style={{flex: 1}}>{this.props.player.name} {this.props.isLeader && this.leaderIcon()}</div>
-          {this.buttons()}
+          <div style={{flex: 1}}>{this.props.player.name} {this.playerIcon()}</div>
+          {/* {this.buttons()} */}
         </div>
       </div>
     )

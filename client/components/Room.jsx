@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 
 import {
   Navigation,
-  Party,
+  PartyList,
   PlayerList,
 } from '.'
 
@@ -24,7 +24,8 @@ export default class Room extends Component {
         {
           !!this.props.party.players.length && (
             <div style={{marginTop: 10}}>
-              <Party
+              <div style={{fontWeight: 'bold'}}>Party:</div>
+              <PartyList
                 party={this.props.party}
                 myPlayer={this.props.myPlayer}
               />
@@ -32,6 +33,7 @@ export default class Room extends Component {
           )
         }
         <div style={{marginTop: 10}}>
+          <div style={{fontWeight: 'bold'}}>Players in room:</div>
           <PlayerList
             players={players}
             myPlayer={this.props.myPlayer}

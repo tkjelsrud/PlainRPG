@@ -16,9 +16,9 @@ export default class World {
 
   findConnectedRoom(room, dir) {
     const roomInfo = this.roomInfo(room)
-    const exit = roomInfo.exits.find(e => e.dir === dir)
-    if (exit) {
-      return this.roomInfo(exit.room)
+    const exit = roomInfo.exits[dir]
+    if (exit !== undefined) {
+      return this.roomInfo(exit)
     }
     else {
       // TODO
@@ -30,7 +30,7 @@ export default class World {
     const roomInfo = this.roomInfo(room)
     return {
       ...roomInfo,
-      players: roomInfo.players.map(p => p.name)
+      players: roomInfo.players.map(p => ({name: p.name}))
     }
   }
 

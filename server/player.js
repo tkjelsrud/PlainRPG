@@ -1,15 +1,11 @@
 import {OPEN} from 'ws'
 
 export default class Player {
-  constructor(name, connection) {
-    this.connection = connection
-    this.connected = true
+  constructor(name) {
+    this.connection = null
+    this.connected = false
     this.name = name
     this.room = null
-  }
-
-  disconnect() {
-    this.connected = false
   }
 
   send(message) {

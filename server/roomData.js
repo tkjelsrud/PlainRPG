@@ -7,23 +7,23 @@ export default [
   {
     id: 0,
     name: 'Marketplace',
-    exits: [
-      {dir: DIR_S, room: 1},
-    ],
+    exits: {
+      [DIR_S]: 1,
+    },
   },
   {
     id: 1,
     name: 'Town well',
-    exits: [
-      {dir: DIR_N, room: 0},
-      {dir: DIR_E, room: 2},
-    ],
+    exits: {
+      [DIR_N]: 0,
+      [DIR_E]: 2,
+    },
   },
   {
     id: 2,
     name: 'Bakery',
-    exits: [
-      {dir: DIR_W, room: 1},
-    ],
+    exits: {
+      [DIR_W]: 1,
+    },
   },
 ]

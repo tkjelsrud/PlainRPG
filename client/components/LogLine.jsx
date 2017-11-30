@@ -13,6 +13,7 @@ const COLORS = {
   chat: '#99e099',
   move: '#426ae6',
   joinParty: '#78e267',
+  leaveParty: '#78e267',
   unknown: '#787b1b',
 }
 
@@ -29,25 +30,28 @@ export default class LogLine extends Component {
         text = message.text
         break
       case 'login':
-        text = `${message.player} logged in`
+        text = `${message.player.name} logged in`
         break
       case 'logout':
-        text = `${message.player} logged out`
+        text = `${message.player.name} logged out`
         break
       case 'roomInfo':
         text = `You entered ${message.room}`
         break
       case 'move':
-        text = `${message.player} ${message.entered ? 'entered' : 'left'} the room`
+        text = `${message.player.name} ${message.entered ? 'entered' : 'left'} the room`
         break
       case 'joinParty':
         text = 'You have joined a party'
+        break
+      case 'leaveParty':
+        text = `${message.player.name} left the party`
         break
       case 'chat':
         return (
           <span>
             <span style={{color: COLORS.channel, marginRight: 4}}>[{message.channel}]</span>
-            <span style={{color: COLORS.player, marginRight: 4}}>{message.player}:</span>
+            <span style={{color: COLORS.player, marginRight: 4}}>{message.player.name}:</span>
             <span style={{color: COLORS.chat}}>{message.text}</span>
           </span>
         )

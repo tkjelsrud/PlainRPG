@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import moment from 'moment'
+import queryString from 'query-string'
 
 // import '../sass/index.scss'
 import Client from '../js/client'
@@ -34,7 +35,8 @@ export default class App extends Component {
     const client = new Client
     this.setState({client})
 
-    const playerName = `Player_${Math.floor(Math.random()*900 + 100)}`
+    const parsed = queryString.parse(location.search)
+    const playerName = parsed.name || `Player_${Math.floor(Math.random()*900 + 100)}`
 
     client.connect()
     .then(() => {
@@ -52,11 +54,21 @@ export default class App extends Component {
     }})
   }
 
-  removeFromRoom(player) {
+  removeFromRoom({name}) {
     this.setState({roomInfo: {
       ...this.state.roomInfo,
-      players: this.state.roomInfo.players.filter(p => p !== player)
+      players: this.state.roomInfo.players.filter(p => p.name !== name)
     }})
+  }
+
+  removeFromParty(player) {
+    if (this.state.party.players.find(p => p.name === player.name)) {
+      this.setState({party: {
+        ...this.state.party,
+        players: this.state.party.players.filter(p => p.name !== player.name)
+      }})
+      this.logMessage({type: 'leaveParty', player})
+    }
   }
 
   playerMoved({player, from, to}) {
@@ -104,6 +116,7 @@ export default class App extends Component {
         this.logMessage({type: 'logout', player: message.player})
         if (message.room === this.state.roomInfo.id) {
           this.removeFromRoom(message.player)
+          this.removeFromParty(message.player)
         }
         break
       case 'playerMoved':
@@ -153,7 +166,10 @@ export default class App extends Component {
           <h3>Lemuria Online</h3>
           <MessageLog messages={this.state.messageLog} />
           <div style={{marginTop: 6}}>
-            <GameInput onSubmit={::this.chat} />
+            <GameInput
+              onSubmit={::this.chat}
+              isInParty={!!this.state.party.players.length}
+            />
           </div>
         </div>
         <div style={{width: 200, marginLeft: 10}}>

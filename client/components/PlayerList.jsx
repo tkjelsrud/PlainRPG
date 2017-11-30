@@ -20,13 +20,13 @@ export default class PlayerList extends Component {
   }
 
   render() {
+    const sorted = this.props.players.sort((a, b) => a.name.localeCompare(b.name))
     return (
       <div style={{}}>
-        <div style={{fontWeight: 'bold'}}>Players in room:</div>
-        {this.props.players.map((p, i) => <PlayerEntry
+        {sorted.map((p, i) => <PlayerEntry
           key={i}
-          player={{name: p}}
-          isMe={p === this.props.myPlayer.name}
+          player={p}
+          isMe={p.name === this.props.myPlayer.name}
           isSelected={this.state.selected === p}
           onClick={evt => this.select(p)}
           onInvite={() => this.props.onInvite(p)}

@@ -6,12 +6,12 @@ import {
 
 export default class Navigation extends Component {
   static propTypes = {
-    exits: React.PropTypes.array,
+    exits: React.PropTypes.object,
     onMove: React.PropTypes.func,
   }
 
   open(dir) {
-    return this.props.exits && !!this.props.exits.find(e => e.dir === dir)
+    return this.props.exits && this.props.exits[dir] !== undefined
   }
 
   navRow(exits) {

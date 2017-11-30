@@ -1,3 +1,7 @@
+import {
+  Player,
+} from '.'
+
 export default class Population {
   constructor() {
     this.players = []
@@ -7,9 +11,8 @@ export default class Population {
       this.players.forEach(player => {
         const connection = player.connection
         if (!connection.isConnected) {
-          player.connected = false
-          this.broadcastDisconnect(player)
-          return connection.terminate()
+          console.log(player.name, 'timed out')
+          return this.disconnectPlayer(player)
         }
 
         connection.isConnected = false
@@ -17,6 +20,10 @@ export default class Population {
       })
       this.players = this.players.filter(p => p.connected)
     }, 5000)
+  }
+
+  getPlayer(loginName) {
+    return new Player(loginName)
   }
 
   addPlayer(player) {
@@ -28,11 +35,17 @@ export default class Population {
     connection.on('pong', () => connection.isConnected = true)
 
     connection.on('close', () => {
-      player.disconnect()
       console.log(player.name, 'disconnected')
-      this.players = this.players.filter(p => p !== player)
-      this.broadcastDisconnect(player)
+      this.disconnectPlayer(player)
     })
+  }
+
+  disconnectPlayer(player) {
+    this.leaveParty(player)
+    player.connected = false
+    this.players = this.players.filter(p => p !== player)
+    this.broadcastDisconnect(player)
+    player.connection.terminate()
   }
 
   findPlayerByConnection(connection) {
@@ -49,6 +62,13 @@ export default class Population {
 
   findParty(player) {
     return this.parties.find(p => p.players.includes(player))
+  }
+
+  serializePlayer(player) {
+    const {name} = player
+    return {
+      name,
+    }
   }
 
   partyInvite(fromPlayer, toPlayerName) {
@@ -77,17 +97,24 @@ export default class Population {
     this.broadcastParty(party)
   }
 
+  leaveParty(player) {
+    const party = this.findParty(player)
+    if (party) {
+      party.players = party.players.filter(p => p !== player)
+    }
+  }
+
   broadcastLogin(player) {
     this.players.forEach(recipient => {
       if (recipient !== player) {
-        recipient.send({type: 'playerLoggedIn', player: player.name, room: player.room})
+        recipient.send({type: 'playerLoggedIn', player: this.serializePlayer(player), room: player.room})
       }
     })
   }
 
   broadcastDisconnect(player) {
     this.players.forEach(recipient => {
-      recipient.send({type: 'playerLoggedOut', player: player.name, room: player.room})
+      recipient.send({type: 'playerLoggedOut', player: this.serializePlayer(player), room: player.room})
     })
   }
 
@@ -97,7 +124,7 @@ export default class Population {
     const recipients = [...fromRoom, ...toRoom]
     recipients.forEach(recipient => {
       if (recipient !== player) {
-        recipient.send({type: 'playerMoved', player: player.name, from: fromRoomId, to: toRoomId})
+        recipient.send({type: 'playerMoved', player: this.serializePlayer(player), from: fromRoomId, to: toRoomId})
       }
     })
   }
@@ -107,7 +134,7 @@ export default class Population {
       recipient.send({
         type: 'partyInfo',
         leader: party.leader.name,
-        players: party.players.map(p => ({name: p.name}))
+        players: party.players.map(this.serializePlayer)
       })
     })
   }

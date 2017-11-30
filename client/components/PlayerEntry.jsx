@@ -17,8 +17,18 @@ export default class PlayerEntry extends Component {
     isMe: React.PropTypes.bool,
   }
 
+  canInvite() {
+    return this.props.isSelected && !this.props.isMe
+  }
+
+  leaderIcon() {
+    return (
+      <span style={{fontSize: '11px'}}>👑</span>
+    )
+  }
+
   buttons() {
-    if (this.props.isSelected && !this.props.isMe) {
+    if (this.canInvite()) {
       return (
         <div>
           <button type="button" style={{cursor: 'pointer'}} onClick={::this.props.onInvite}>I</button>
