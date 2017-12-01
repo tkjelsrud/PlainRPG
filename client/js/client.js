@@ -24,7 +24,7 @@ export default class Client {
       }
 
       this.socket.onmessage = event => {
-        this.debug('message:', event.data)
+        this.debug('messages:', event.data)
         const message = JSON.parse(event.data)
 
         switch (message.type) {

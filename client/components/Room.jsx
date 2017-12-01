@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 
 import {
+  Map,
   Navigation,
   PartyList,
   PlayerList,
@@ -13,6 +14,7 @@ export default class Room extends Component {
     onInvite: React.PropTypes.func,
     myPlayer: React.PropTypes.object,
     party: React.PropTypes.object,
+    map: React.PropTypes.object,
   }
 
   render() {
@@ -20,6 +22,12 @@ export default class Room extends Component {
     return (
       <div>
         <h3>{name}</h3>
+        <div style={{marginBottom: 6}}>
+          <Map
+            map={this.props.map}
+            myRoom={this.props.roomInfo.id}
+          />
+        </div>
         <Navigation exits={exits} onMove={::this.props.onMove} />
         {
           !!this.props.party.players.length && (

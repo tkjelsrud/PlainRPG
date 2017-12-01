@@ -1,5 +1,8 @@
 import Population from './Population'
-import {staticRoomData} from './rooms'
+import {
+  staticRoomData,
+  serializeMap,
+} from './rooms'
 
 export default class World {
   constructor(name, connection) {
@@ -8,7 +11,6 @@ export default class World {
 
   roomInfo(room) {
     return {
-      type: 'roomInfo',
       ...staticRoomData(room),
       players: this.population.playersInRoom(room),
     }
@@ -29,6 +31,7 @@ export default class World {
   sendRoomInfo(room) {
     const roomInfo = this.roomInfo(room)
     return {
+      type: 'roomInfo',
       ...roomInfo,
       players: roomInfo.players.map(p => ({name: p.name}))
     }
@@ -41,7 +44,15 @@ export default class World {
 
     this.population.broadcastLogin(player)
 
-    player.send(this.sendRoomInfo(player.room))
+    player.send([
+      this.sendRoomInfo(player.room),
+      {
+        type: 'map',
+        map: {
+          rooms: serializeMap()
+        },
+      },
+    ])
   }
 
   chat(sender, channel, text) {

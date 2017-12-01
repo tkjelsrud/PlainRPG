@@ -20,6 +20,9 @@ export default class App extends Component {
     myPlayer: {
       playerName: '',
     },
+    map: {
+      rooms: [],
+    },
     party: {
       leader: null,
       players: [],
@@ -44,7 +47,7 @@ export default class App extends Component {
       client.login(playerName)
     })
 
-    client.incoming(::this.handleMessage)
+    client.incoming(::this.handleMessages)
   }
 
   addToRoom(player) {
@@ -92,6 +95,16 @@ export default class App extends Component {
     this.setState({party: {leader, players}})
   }
 
+  mapInfo({map}) {
+    this.setState({
+      map
+    })
+  }
+
+  handleMessages(messages) {
+    messages.forEach(::this.handleMessage)
+  }
+
   handleMessage(message) {
     switch (message.type) {
       case 'text':
@@ -127,6 +140,9 @@ export default class App extends Component {
         break
       case 'partyInfo':
         this.partyInfo(message)
+        break
+      case 'map':
+        this.mapInfo(message)
         break
       case 'chat':
         const {player, channel, text} = message
@@ -175,6 +191,7 @@ export default class App extends Component {
         <div style={{width: 200, marginLeft: 10}}>
           <Room
             roomInfo={this.state.roomInfo}
+            map={this.state.map}
             onMove={::this.onMove}
             party={this.state.party}
             myPlayer={this.state.myPlayer}

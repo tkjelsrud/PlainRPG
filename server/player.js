@@ -8,9 +8,10 @@ export default class Player {
     this.room = null
   }
 
-  send(message) {
+  send(messages) {
+    const arr = Array.isArray(messages) ? messages : [messages]
     if (this.connection.readyState === OPEN) {
-      this.connection.send(JSON.stringify(message))
+      this.connection.send(JSON.stringify(arr))
     }
   }
 }
