@@ -1,4 +1,4 @@
-import Population from './Population'
+import {Population} from '.'
 import {
   staticRoomData,
   serializeMap,

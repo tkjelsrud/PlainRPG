@@ -1,4 +1,3 @@
-const SOCKET_ADDRESS = 'ws://localhost:8090'
 const DEBUG = true
 
 export default class Client {
@@ -16,7 +15,7 @@ export default class Client {
 
   connect() {
     return new Promise(resolve => {
-      this.socket = new WebSocket(SOCKET_ADDRESS)
+      this.socket = new WebSocket(`ws://${location.hostname}:8264`)
 
       this.socket.onopen = () => {
         this.debug('socket opened')

@@ -1,5 +1,3 @@
-import WebSocket from 'ws'
-
 import {
   World,
 } from './server'
@@ -52,10 +50,7 @@ function handleMessage(message, connection) {
   }
 }
 
-export default function run() {
-  const wss = new WebSocket.Server({ port: 8090 })
-  console.log('WebSocket server started')
-
+export default function socketHost(wss) {
   wss.on('connection', ws => {
     ws.on('message', message => {
       handleMessage(JSON.parse(message), ws)
