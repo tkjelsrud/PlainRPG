@@ -16,32 +16,38 @@ export default class Map extends Component {
     myRoom: React.PropTypes.number,
   }
 
+  roomOffset(pos) {
+    return {
+      top: PADDING + pos[1] * (ROOM_SIZE + SPACING),
+      left: PADDING + pos[0] * (ROOM_SIZE + SPACING)
+    }
+  }
+
   roomRect(pos, inset = 0) {
+    const {top, left} = this.roomOffset(pos)
     return [
-      PADDING + pos[0] * (ROOM_SIZE + SPACING) + inset,
-      PADDING + pos[1] * (ROOM_SIZE + SPACING) + inset,
-      ROOM_SIZE - 1 - 2 * inset,
-      ROOM_SIZE - 1 - 2 * inset
+      left + inset,
+      top + inset,
+      ROOM_SIZE - 2 * inset,
+      ROOM_SIZE - 2 * inset
     ]
   }
 
   roomDoor(pos, dir, inset = 0) {
-    if (dir === 's') {
-      const x = PADDING + pos[0] * (ROOM_SIZE + SPACING) + DOOR_INSET + inset
-      const y = PADDING + pos[1] * (ROOM_SIZE + SPACING) + ROOM_SIZE - 1 - WALL_THICKNESS
-      const w = ROOM_SIZE - 1 - 2 * DOOR_INSET - 2 * inset
-      const h = SPACING + 1 + 2 * WALL_THICKNESS
+    const {top, left} = this.roomOffset(pos)
+    const doorWidth = ROOM_SIZE - 2 * DOOR_INSET - 2 * inset
+    const doorDepth = SPACING + 2 * WALL_THICKNESS + 1
 
-      return [x, y, w, h]
+    if (dir === 's') {
+      const x = left + DOOR_INSET + inset
+      const y = top + ROOM_SIZE - WALL_THICKNESS - 1
+      return [x, y, doorWidth, doorDepth]
     }
 
     if (dir === 'e') {
-      const x = PADDING + pos[0] * (ROOM_SIZE + SPACING) + ROOM_SIZE - 1 - WALL_THICKNESS
-      const y = PADDING + pos[1] * (ROOM_SIZE + SPACING) + DOOR_INSET + inset
-      const w = SPACING + 1 + 2 * WALL_THICKNESS
-      const h = ROOM_SIZE - 1 - 2 * DOOR_INSET - 2 * inset
-
-      return [x, y, w, h]
+      const x = left + ROOM_SIZE - WALL_THICKNESS - 1
+      const y = top + DOOR_INSET + inset
+      return [x, y, doorDepth, doorWidth]
     }
   }
 
@@ -62,6 +68,7 @@ export default class Map extends Component {
         ctx.fill()
 
         Object.keys(r.exits).forEach(e => {
+          // as long as everything's connected both ways in a grid, we can skiip north and west, and only draw south and east
           if (['n', 'w'].includes(e)) return
 
           ctx.beginPath()
@@ -106,7 +113,6 @@ export default class Map extends Component {
   render() {
     this.drawMap()
 
-    const backgroundColor = this.props.isSelected ? '#eee' : 'transparent'
     return (
       <div>
         <canvas ref="canvas" width={MAP_SIZE[0]} height={MAP_SIZE[1]} style={{width: 160, height: 160, backgroundColor: '#dadada'}}/>
