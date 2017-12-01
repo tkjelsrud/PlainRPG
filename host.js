@@ -6,7 +6,7 @@ import {
 
 const DEBUG = true
 
-const world = new World
+const world = new World()
 
 function debug(message) {
   if (DEBUG) {
@@ -53,7 +53,7 @@ function handleMessage(message, connection) {
 }
 
 export default function run() {
-  const wss = new WebSocket.Server({ port: 8090 });
+  const wss = new WebSocket.Server({ port: 8090 })
   console.log('WebSocket server started')
 
   wss.on('connection', ws => {

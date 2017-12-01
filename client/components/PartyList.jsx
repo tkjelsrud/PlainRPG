@@ -34,7 +34,7 @@ export default class PartyList extends Component {
           isMe={p === this.props.myPlayer.name}
           isSelected={this.state.selected === p}
           isLeader={this.props.party.leader === p.name}
-          onClick={evt => this.select(p)}
+          onClick={() => this.select(p)}
         />)}
       </div>
     )

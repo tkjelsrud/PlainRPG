@@ -32,7 +32,7 @@ export default class Population {
     const connection = player.connection
 
     connection.isConnected = true
-    connection.on('pong', () => connection.isConnected = true)
+    connection.on('pong', () => { connection.isConnected = true })
 
     connection.on('close', () => {
       console.log(player.name, 'disconnected')
@@ -40,7 +40,7 @@ export default class Population {
     })
 
     connection.on('error', e => {
-	    console.log('socket error', e)
+      console.log('socket error', e)
       this.disconnectPlayer(player)
     })
   }
@@ -70,7 +70,7 @@ export default class Population {
   }
 
   serializePlayer(player) {
-    const {name} = player
+    const {name} = player
     return {
       name,
     }

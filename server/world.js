@@ -5,8 +5,8 @@ import {
 } from './rooms'
 
 export default class World {
-  constructor(name, connection) {
-    this.population = new Population
+  constructor() {
+    this.population = new Population()
   }
 
   roomInfo(room) {
@@ -22,10 +22,9 @@ export default class World {
     if (exit !== undefined) {
       return this.roomInfo(exit)
     }
-    else {
-      // TODO
-      console.warn('invalid move from', room, '->', dir)
-    }
+
+    // TODO
+    console.warn('invalid move from', room, '->', dir)
   }
 
   sendRoomInfo(room) {

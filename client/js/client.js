@@ -15,10 +15,10 @@ export default class Client {
   }
 
   connect() {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       this.socket = new WebSocket(SOCKET_ADDRESS)
 
-      this.socket.onopen = event => {
+      this.socket.onopen = () => {
         this.debug('socket opened')
         resolve()
       }

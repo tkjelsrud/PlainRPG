@@ -35,17 +35,17 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    const client = new Client
+    const client = new Client()
     this.setState({client})
 
     const parsed = queryString.parse(location.search)
-    const playerName = parsed.name || `Player_${Math.floor(Math.random()*900 + 100)}`
+    const playerName = parsed.name || `Player_${Math.floor(Math.random() * 900 + 100)}`
 
     client.connect()
-    .then(() => {
-      this.logMessage({type: 'info', text: 'Logging in...'})
-      client.login(playerName)
-    })
+      .then(() => {
+        this.logMessage({type: 'info', text: 'Logging in...'})
+        client.login(playerName)
+      })
 
     client.incoming(::this.handleMessages)
   }
@@ -76,11 +76,11 @@ export default class App extends Component {
 
   playerMoved({player, from, to}) {
     if (to === this.state.roomInfo.id) {
-      this.logMessage({type: 'move', player: player, entered: true})
+      this.logMessage({type: 'move', player, entered: true})
       this.addToRoom(player)
     }
     else if (from === this.state.roomInfo.id) {
-      this.logMessage({type: 'move', player: player, entered: false})
+      this.logMessage({type: 'move', player, entered: false})
       this.removeFromRoom(player)
     }
   }
@@ -144,10 +144,11 @@ export default class App extends Component {
       case 'map':
         this.mapInfo(message)
         break
-      case 'chat':
+      case 'chat': {
         const {player, channel, text} = message
         this.logMessage({type: 'chat', channel, player, text})
         break
+      }
       default:
         console.error('Unknown message type:', message.type)
     }

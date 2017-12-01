@@ -28,7 +28,7 @@ export default class PlayerList extends Component {
           player={p}
           isMe={p.name === this.props.myPlayer.name}
           isSelected={this.state.selected === p}
-          onClick={evt => this.select(p)}
+          onClick={() => this.select(p)}
           onInvite={() => this.props.onInvite(p)}
         />)}
       </div>

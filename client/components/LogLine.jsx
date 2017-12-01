@@ -55,7 +55,6 @@ export default class LogLine extends Component {
             <span style={{color: COLORS.chat}}>{message.text}</span>
           </span>
         )
-        break
       default:
         text = message.text
         break
