@@ -1,6 +1,6 @@
 import {
   World,
-} from './server'
+} from '.'
 
 const DEBUG = true
 

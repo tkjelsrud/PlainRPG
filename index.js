@@ -2,7 +2,7 @@ const express = require('express')
 const http = require('http')
 const WebSocket = require('ws')
 
-import socketHost from './host'
+import socketHost from './server/host'
 
 const app = express()
 

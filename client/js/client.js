@@ -14,27 +14,27 @@ export default class Client {
   }
 
   connect() {
-    return new Promise(resolve => {
-      this.socket = new WebSocket(`ws://${location.hostname}:8264`)
+    this.socket = new WebSocket(`ws://${location.hostname}:8264`)
 
+    this.socket.onmessage = event => {
+      this.debug('messages:', event.data)
+      const message = JSON.parse(event.data)
+
+      switch (message.type) {
+        case 'login':
+          this.isLoggedIn = message.success
+          break
+      }
+
+      if (this.appCallback) {
+        this.appCallback(message)
+      }
+    }
+
+    return new Promise(resolve => {
       this.socket.onopen = () => {
         this.debug('socket opened')
         resolve()
-      }
-
-      this.socket.onmessage = event => {
-        this.debug('messages:', event.data)
-        const message = JSON.parse(event.data)
-
-        switch (message.type) {
-          case 'login':
-            this.isLoggedIn = message.success
-            break
-        }
-
-        if (this.appCallback) {
-          this.appCallback(message)
-        }
       }
     })
   }
