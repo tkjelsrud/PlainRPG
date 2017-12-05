@@ -109,9 +109,10 @@ export default class Population {
     }
   }
 
-  // changeMap(player, map) {
-  //   // TODO
-  // }
+  changeMap(player, map) {
+    player.map = map
+    player.room = map.findRoom(0)
+  }
 
   // broadcast
   broadcastLogin(player) {

@@ -1,14 +1,16 @@
+import dungeonGenerator from './generators/dungeonGenerator'
+import overworldData from './overworldData'
+
 import {
   Map,
   Population,
 } from '.'
-// import dungeonGenerator from './generators/dungeonGenerator'
-import overworldData from './overworldData'
 
 export default class World {
   constructor() {
     this.population = new Population()
     this.overworld = new Map(overworldData)
+    this.dungeons = []
   }
 
   sendRoomInfo(player) {
@@ -24,11 +26,13 @@ export default class World {
 
     // TODO: persist and retrieve
     const map = this.overworld
-    player.map = map
-    player.room = map.findRoom(0)
+    this.changeMap(player, map)
 
     this.population.broadcastLogin(player)
+  }
 
+  changeMap(player, map) {
+    this.population.changeMap(player, map)
     player.send([
       this.sendRoomInfo(player),
       {
@@ -36,6 +40,7 @@ export default class World {
         map: map.serialize()
       },
     ])
+    // TODO: broadcast
   }
 
   chat(sender, channel, text) {
@@ -81,11 +86,14 @@ export default class World {
   }
 
   createRandomDungeon() {
-    // const roomData = dungeonGenerator({
-    //   type: 'randomPrim',
-    //   width: 6,
-    //   height: 6,
-    //   shape: 'box',
-    // })
+    const rooms = dungeonGenerator({
+      type: 'randomPrim',
+      width: 6,
+      height: 6,
+      shape: 'box',
+    })
+    const map = new Map(rooms)
+    this.dungeons.push(map)
+    return map
   }
 }

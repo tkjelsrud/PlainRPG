@@ -47,12 +47,12 @@ function handleMessage(message, connection) {
       world.population.partyInvite(player, message.player)
       debug(`${player.name} inviting ${message.player} to party`)
       break
-    // case 'enterRandomDungeon': {
-    //   debug(`${player.name} entering random dungeon`)
-    //   const map = world.createRandomDungeon()
-    //   world.population.changeMap(player, map)
-    //   break
-    // }
+    case 'enterRandomDungeon': {
+      debug(`${player.name} entering random dungeon`)
+      const map = world.createRandomDungeon()
+      world.changeMap(player, map)
+      break
+    }
   }
 }
 

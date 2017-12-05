@@ -176,6 +176,10 @@ export default class App extends Component {
     this.state.client.partyInvite(player)
   }
 
+  enterRandomDungeon() {
+    this.state.client.enterRandomDungeon()
+  }
+
   render() {
     return (
       <div style={{display: 'flex', fontFamily: 'sans-serif'}}>
@@ -197,6 +201,7 @@ export default class App extends Component {
             party={this.state.party}
             myPlayer={this.state.myPlayer}
             onInvite={::this.onInvite}
+            enterRandomDungeon={::this.enterRandomDungeon}
           />
         </div>
       </div>

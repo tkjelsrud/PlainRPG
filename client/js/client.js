@@ -84,4 +84,12 @@ export default class Client {
       player: name,
     })
   }
+
+  enterRandomDungeon() {
+    this.debug('entering random dungeon')
+
+    this.send({
+      type: 'enterRandomDungeon',
+    })
+  }
 }

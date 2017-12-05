@@ -12,6 +12,7 @@ export default class Room extends Component {
     roomInfo: React.PropTypes.object,
     onMove: React.PropTypes.func,
     onInvite: React.PropTypes.func,
+    enterRandomDungeon: React.PropTypes.func,
     myPlayer: React.PropTypes.object,
     party: React.PropTypes.object,
     map: React.PropTypes.object,
@@ -40,6 +41,9 @@ export default class Room extends Component {
             </div>
           )
         }
+        <div style={{marginTop: 6}}>
+          <button type="button" onClick={::this.props.enterRandomDungeon}>Random Dungeon</button>
+        </div>
         <div style={{marginTop: 10}}>
           <div style={{fontWeight: 'bold'}}>Players in room:</div>
           <PlayerList
