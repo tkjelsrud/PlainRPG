@@ -47,7 +47,7 @@ export default class Client {
   }
 
   send(message) {
-    this.debug('sending:', message)
+    this.debug('->', message)
     this.socket.send(JSON.stringify(message))
   }
 

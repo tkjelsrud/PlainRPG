@@ -108,7 +108,7 @@ export default class App extends Component {
         break
       case 'login':
         if (message.success) {
-          this.logMessage({type: 'info', text: message.text})
+          this.logMessage({type: 'info', text: `Welcome, ${message.playerName}!`})
           this.setState({myPlayer: {name: message.playerName}})
         }
         else {

@@ -5,6 +5,7 @@ import {
 export default class MapGenerator {
   constructor(settings) {
     this.settings = settings
+    this.rooms = this.createRooms(this.settings)
   }
 
   room(x, y) {
@@ -69,7 +70,7 @@ export default class MapGenerator {
   disconnectRoom(r) {
     const neighbors = [DIR_S, DIR_N, DIR_E, DIR_W]
     neighbors.forEach(dir => {
-      const room = this.getNeighbor(this.rooms, r, dir)
+      const room = this.getNeighbor(r, dir)
       if (room) {
         delete room.exits[this.reverseDir(dir)]
       }
@@ -105,13 +106,57 @@ export default class MapGenerator {
     return rooms
   }
 
+  poke(percentage = 0) {
+    let count = Math.ceil(this.rooms.length * percentage)
+    let attempts = 1000
+    while (count > 0 && --attempts > 0) {
+      const index = Math.floor(Math.random() * this.rooms.length)
+      const removed = this.rooms.splice(index, 1)
+      if (this.testFloodFill()) {
+        count--
+      }
+      else {
+        this.rooms.splice(index, 0, ...removed)
+      }
+    }
+  }
+
+  floodFill(room, visited) {
+    if (!visited[room.id]) {
+      visited[room.id] = true
+      const directions = [DIR_S, DIR_N, DIR_E, DIR_W]
+      directions.forEach(d => {
+        const dirDelta = this.getDelta(d)
+        const target = this.findRoomAt(room.x + dirDelta.x, room.y + dirDelta.y)
+        if (target && !visited[target.id]) {
+          this.floodFill(target, visited)
+        }
+      })
+    }
+  }
+
+  testFloodFill() {
+    const visited = {}
+    this.floodFill(this.rooms[0], visited)
+    console.log('rooms', this.rooms.length, 'visited', Object.keys(visited).length)
+    return this.rooms.length === Object.keys(visited).length
+  }
+
+  removeDeadends(chance = 0) {
+    for (let i = this.rooms.length - 1; i > 0; i--) {
+      const room = this.rooms[i]
+      if (Object.keys(room.exits).length <= 1 && Math.random() < chance) {
+        this.disconnectRoom(room)
+        this.rooms.splice(i, 1)
+      }
+    }
+  }
+
   generate() {
     return []
   }
 
   render() {
-    this.rooms = this.createRooms(this.settings)
-    this.generate()
     return this.rooms
   }
 }

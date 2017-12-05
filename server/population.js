@@ -22,12 +22,10 @@ export default class Population {
     }, 5000)
   }
 
-  getPlayer(loginName) {
-    return new Player(loginName)
-  }
-
   addPlayer(player) {
-    this.players.push(player)
+    if (!this.players.includes(player)) {
+      this.players.push(player)
+    }
 
     const connection = player.connection
 
@@ -109,23 +107,24 @@ export default class Population {
     }
   }
 
-  changeMap(player, map) {
+  changeMap(player, map, room) {
     player.map = map
-    player.room = map.findRoom(0)
+    player.room = room
+    player.save()
   }
 
   // broadcast
   broadcastLogin(player) {
     this.players.forEach(recipient => {
       if (recipient !== player) {
-        recipient.send({type: 'playerLoggedIn', player: this.serializePlayer(player), room: player.room})
+        recipient.send({type: 'playerLoggedIn', player: this.serializePlayer(player), room: player.room.id})
       }
     })
   }
 
   broadcastDisconnect(player) {
     this.players.forEach(recipient => {
-      recipient.send({type: 'playerLoggedOut', player: this.serializePlayer(player), room: player.room})
+      recipient.send({type: 'playerLoggedOut', player: this.serializePlayer(player), room: player.room.id})
     })
   }
 

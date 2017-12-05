@@ -1,8 +1,11 @@
+import uuid from 'uuid'
+
 import dungeonGenerator from './generators/dungeonGenerator'
 import overworldData from './overworldData'
 
 import {
   Map,
+  Player,
   Population,
 } from '.'
 
@@ -21,26 +24,51 @@ export default class World {
     }
   }
 
-  playerLogin(player) {
+  async playerLogin(player) {
     this.population.addPlayer(player)
 
-    // TODO: persist and retrieve
-    const map = this.overworld
-    this.changeMap(player, map)
+    const playerData = await this.loadPlayer(player)
+    let map = this.findMap(playerData.mapId)
+    let room
+    if (map) {
+      room = map.findRoom(playerData.roomId)
+    }
+    else {
+      map = this.overworld
+      room = map.entrance
+    }
+    this.changeMap(player, map, room)
 
     this.population.broadcastLogin(player)
   }
 
-  changeMap(player, map) {
-    this.population.changeMap(player, map)
+  getPlayer(loginName) {
+    return new Player(loginName)
+  }
+
+  loadPlayer(player) {
+    return player.load()
+  }
+
+  sendPlayerLocation(player) {
     player.send([
-      this.sendRoomInfo(player),
       {
         type: 'map',
-        map: map.serialize()
+        map: player.map.serialize()
       },
+      this.sendRoomInfo(player),
     ])
+  }
+
+  changeMap(player, map, room) {
+    this.population.changeMap(player, map, room)
+    this.sendPlayerLocation(player)
     // TODO: broadcast
+  }
+
+  findMap(mapId) {
+    if (mapId === this.overworld.id) return this.overworld
+    return this.dungeons.find(d => d.id === mapId)
   }
 
   chat(sender, channel, text) {
@@ -74,7 +102,7 @@ export default class World {
     if (destination) {
       this.population.broadcastMove(player, player.room, destination)
 
-      player.room = destination
+      player.move(destination)
 
       player.send(this.sendRoomInfo(player))
     }
@@ -85,14 +113,31 @@ export default class World {
     }
   }
 
+  enterRandomDungeon(player) {
+    const party = this.population.findParty(player)
+    if (!party || party.leader === player) {
+      const map = this.createRandomDungeon()
+      const players = party ? party.players : [player]
+      players.forEach(p => {
+        this.changeMap(p, map, map.entrance)
+      })
+    }
+  }
+
   createRandomDungeon() {
     const rooms = dungeonGenerator({
       type: 'randomPrim',
       width: 6,
       height: 6,
       shape: 'box',
+      removeDeadends: 0.35,
+      poke: 0.15,
     })
-    const map = new Map(rooms)
+    const map = new Map({
+      id: uuid.v4(),
+      name: 'Random Dungeon',
+      rooms,
+    })
     this.dungeons.push(map)
     return map
   }

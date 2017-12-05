@@ -84,7 +84,7 @@ export default class Map extends Component {
     if (c) {
       const ctx = c.getContext('2d')
       ctx.clearRect(0, 0, c.width, c.height)
-      ctx.setTransform(RATIO, 0, 0, RATIO, 0, 0);
+      ctx.setTransform(RATIO, 0, 0, RATIO, 0, 0)
 
       // map backing
       this.props.map.rooms.forEach(r => {

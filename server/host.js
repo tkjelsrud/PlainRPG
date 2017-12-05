@@ -21,16 +21,21 @@ function handleMessage(message, connection) {
       const loginName = message.name
 
       player = world.population.findPlayerByName(loginName)
-      if (player) {
-        debug(`disconnecting reconnecting player ${loginName}`)
-        world.population.disconnectPlayer(player)
+      if (!player) {
+        player = world.getPlayer(loginName)
+      }
+      else {
+        debug(`${loginName} reconnected`)
+        player.connection.terminate()
+        // TODO: broadcast?
+        // debug(`disconnecting reconnecting player ${loginName}`)
+        // world.population.disconnectPlayer(player)
       }
 
-      player = world.population.getPlayer(loginName)
       player.connection = connection
       player.connected = true
 
-      player.send({type: 'login', success: true, text: `Welcome, ${player.name}!`, playerName: player.name})
+      player.send({type: 'login', success: true, playerName: player.name})
       world.playerLogin(player)
       debug(`${player.name} logged in`)
       break
@@ -49,8 +54,7 @@ function handleMessage(message, connection) {
       break
     case 'enterRandomDungeon': {
       debug(`${player.name} entering random dungeon`)
-      const map = world.createRandomDungeon()
-      world.changeMap(player, map)
+      world.enterRandomDungeon(player)
       break
     }
   }

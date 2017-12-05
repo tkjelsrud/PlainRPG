@@ -18,6 +18,17 @@ export default class Room extends Component {
     map: React.PropTypes.object,
   }
 
+  leaderContent() {
+    const party = this.props.party
+    if (!party.leader || party.leader === this.props.myPlayer.name) {
+      return (
+        <div style={{marginTop: 6}}>
+          <button type="button" onClick={::this.props.enterRandomDungeon}>Random Dungeon</button>
+        </div>
+      )
+    }
+  }
+
   render() {
     const {name, exits, players} = this.props.roomInfo
     return (
@@ -41,9 +52,7 @@ export default class Room extends Component {
             </div>
           )
         }
-        <div style={{marginTop: 6}}>
-          <button type="button" onClick={::this.props.enterRandomDungeon}>Random Dungeon</button>
-        </div>
+        {this.leaderContent()}
         <div style={{marginTop: 10}}>
           <div style={{fontWeight: 'bold'}}>Players in room:</div>
           <PlayerList

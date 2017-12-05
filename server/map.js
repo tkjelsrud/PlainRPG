@@ -1,6 +1,9 @@
 export default class Map {
-  constructor(rooms) {
+  constructor({id, name, rooms}) {
+    this.id = id
+    this.name = name
     this.rooms = rooms
+    this.entrance = this.rooms[0]
   }
 
   findConnectedRoom(room, dir) {

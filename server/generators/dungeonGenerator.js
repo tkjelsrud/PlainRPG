@@ -19,25 +19,18 @@ function generateType(settings) {
       break
     }
   }
+
+  gen.poke(settings.poke)
+
+  gen.generate()
+
+  gen.removeDeadends(settings.removeDeadends)
+
   return gen.render()
 }
 
-// function purgeDeadEnds(rooms, chance) {
-//   // TODO: broken - see disconnectRoom
-//   return
-//   for (let i = rooms.length - 1; i > 0; i--) {
-//     const room = rooms[i]
-//     if (Object.keys(room.exits).length <= 1 && Math.random() < chance) {
-//       disconnectRoom(rooms, room)
-//       rooms.splice(i, 1)
-//     }
-//   }
-// }
-
 export default function generate(settings) {
   const rooms = generateType(settings)
-
-  // purgeDeadEnds(rooms, 0.6)
 
   const map = rooms.map(r => ({
     id: r.id,
