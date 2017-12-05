@@ -129,7 +129,7 @@ export default class World {
       type: 'randomPrim',
       width: 6,
       height: 6,
-      shape: 'box',
+      shape: 'filled',
       removeDeadends: 0.35,
       poke: 0.15,
     })

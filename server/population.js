@@ -1,5 +1,4 @@
 import {
-  Player,
 } from '.'
 
 export default class Population {
