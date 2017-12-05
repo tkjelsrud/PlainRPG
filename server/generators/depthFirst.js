@@ -4,7 +4,7 @@ import MapGenerator from './mapGenerator'
 
 import {
   DIR_S, DIR_N, DIR_E, DIR_W,
-} from './utils'
+} from '../direction'
 
 export default class DepthFirst extends MapGenerator {
   dig(room, visited) {

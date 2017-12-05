@@ -109,6 +109,11 @@ export default class Population {
     }
   }
 
+  // changeMap(player, map) {
+  //   // TODO
+  // }
+
+  // broadcast
   broadcastLogin(player) {
     this.players.forEach(recipient => {
       if (recipient !== player) {
@@ -123,13 +128,13 @@ export default class Population {
     })
   }
 
-  broadcastMove(player, fromRoomId, toRoomId) {
-    const fromRoom = this.playersInRoom(fromRoomId)
-    const toRoom = this.playersInRoom(toRoomId)
-    const recipients = [...fromRoom, ...toRoom]
+  broadcastMove(player, fromRoom, toRoom) {
+    const fromList = this.playersInRoom(fromRoom)
+    const toList = this.playersInRoom(toRoom)
+    const recipients = [...fromList, ...toList]
     recipients.forEach(recipient => {
       if (recipient !== player) {
-        recipient.send({type: 'playerMoved', player: this.serializePlayer(player), from: fromRoomId, to: toRoomId})
+        recipient.send({type: 'playerMoved', player: this.serializePlayer(player), from: fromRoom.id, to: toRoom.id})
       }
     })
   }

@@ -41,12 +41,18 @@ function handleMessage(message, connection) {
       break
     case 'move':
       world.move(player, message.dir)
-      debug(`${player.name} moving from ${player.room} -> ${message.dir}`)
+      debug(`${player.name} moving from ${player.room.id} -> ${message.dir}`)
       break
     case 'partyInvite':
       world.population.partyInvite(player, message.player)
       debug(`${player.name} inviting ${message.player} to party`)
       break
+    // case 'enterRandomDungeon': {
+    //   debug(`${player.name} entering random dungeon`)
+    //   const map = world.createRandomDungeon()
+    //   world.population.changeMap(player, map)
+    //   break
+    // }
   }
 }
 

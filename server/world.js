@@ -1,55 +1,39 @@
-import {Population} from '.'
 import {
-  staticRoomData,
-  serializeMap,
-} from './rooms'
+  Map,
+  Population,
+} from '.'
+// import dungeonGenerator from './generators/dungeonGenerator'
+import overworldData from './overworldData'
 
 export default class World {
   constructor() {
     this.population = new Population()
+    this.overworld = new Map(overworldData)
   }
 
-  roomInfo(room) {
-    return {
-      ...staticRoomData(room),
-      players: this.population.playersInRoom(room),
-    }
-  }
-
-  findConnectedRoom(room, dir) {
-    const roomInfo = this.roomInfo(room)
-    const exit = roomInfo.exits[dir]
-    if (exit !== undefined) {
-      return this.roomInfo(exit)
-    }
-
-    // TODO
-    console.warn('invalid move from', room, '->', dir)
-  }
-
-  sendRoomInfo(room) {
-    const roomInfo = this.roomInfo(room)
+  sendRoomInfo(player) {
     return {
       type: 'roomInfo',
-      ...roomInfo,
-      players: roomInfo.players.map(p => ({name: p.name}))
+      ...player.room,
+      players: this.population.playersInRoom(player.room).map(p => ({name: p.name}))
     }
   }
 
   playerLogin(player) {
     this.population.addPlayer(player)
 
-    player.room = 0 // TODO: persist and retrieve
+    // TODO: persist and retrieve
+    const map = this.overworld
+    player.map = map
+    player.room = map.findRoom(0)
 
     this.population.broadcastLogin(player)
 
     player.send([
-      this.sendRoomInfo(player.room),
+      this.sendRoomInfo(player),
       {
         type: 'map',
-        map: {
-          rooms: serializeMap()
-        },
+        map: map.serialize()
       },
     ])
   }
@@ -81,14 +65,27 @@ export default class World {
   }
 
   move(player, dir) {
-    const roomInfo = this.findConnectedRoom(player.room, dir)
-    if (roomInfo) {
-      const newRoomId = roomInfo.id
-      this.population.broadcastMove(player, player.room, newRoomId)
+    const destination = player.map.findConnectedRoom(player.room, dir)
+    if (destination) {
+      this.population.broadcastMove(player, player.room, destination)
 
-      player.room = newRoomId
+      player.room = destination
 
-      player.send(this.sendRoomInfo(newRoomId))
+      player.send(this.sendRoomInfo(player))
     }
+
+    else {
+      // TODO
+      console.warn('invalid move from', player.room, '->', dir)
+    }
+  }
+
+  createRandomDungeon() {
+    // const roomData = dungeonGenerator({
+    //   type: 'randomPrim',
+    //   width: 6,
+    //   height: 6,
+    //   shape: 'box',
+    // })
   }
 }

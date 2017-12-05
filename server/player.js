@@ -5,6 +5,7 @@ export default class Player {
     this.connection = null
     this.connected = false
     this.name = name
+    this.map = null
     this.room = null
   }
 

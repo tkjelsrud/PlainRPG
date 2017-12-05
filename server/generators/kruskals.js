@@ -4,7 +4,7 @@ import MapGenerator from './mapGenerator'
 
 import {
   DIR_S, DIR_E,
-} from './utils'
+} from '../direction'
 
 export default class Kruskals extends MapGenerator {
   findSection(room) {
