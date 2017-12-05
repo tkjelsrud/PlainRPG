@@ -13,22 +13,25 @@ export default class Client {
     }
   }
 
+  handleMessage(message) {
+    this.debug('message:', message)
+    switch (message.type) {
+      case 'login':
+        this.isLoggedIn = message.success
+        break
+    }
+
+    if (this.appCallback) {
+      this.appCallback(message)
+    }
+  }
+
   connect() {
     this.socket = new WebSocket(`ws://${location.hostname}:8264`)
 
     this.socket.onmessage = event => {
-      this.debug('messages:', event.data)
-      const message = JSON.parse(event.data)
-
-      switch (message.type) {
-        case 'login':
-          this.isLoggedIn = message.success
-          break
-      }
-
-      if (this.appCallback) {
-        this.appCallback(message)
-      }
+      const messages = JSON.parse(event.data)
+      messages.forEach(::this.handleMessage)
     }
 
     return new Promise(resolve => {

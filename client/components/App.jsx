@@ -47,7 +47,7 @@ export default class App extends Component {
         client.login(playerName)
       })
 
-    client.incoming(::this.handleMessages)
+    client.incoming(::this.handleMessage)
   }
 
   addToRoom(player) {
@@ -99,10 +99,6 @@ export default class App extends Component {
     this.setState({
       map
     })
-  }
-
-  handleMessages(messages) {
-    messages.forEach(::this.handleMessage)
   }
 
   handleMessage(message) {
